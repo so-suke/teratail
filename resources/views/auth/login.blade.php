@@ -68,6 +68,25 @@
         </div>
       </div>
     </div>
+
+    <div class="col-md-4">
+      <div class="card" style="width: 18rem;">
+        <div class="card-header">
+          <span class="text-danger">下記、ログイン情報でログインできます。</span>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item d-flex flex-column" v-for="(idx) in 5">
+            <span>email: a@{{ idx - 1 }}@gmail.com</span>
+            <span>password: p@{{ idx - 1 }}</span>
+          </li>
+        </ul>
+      </div>
+    </div>
   </div>
 </div>
+@endsection
+
+@section('scripts')
+	@parent
+	<script src="{{ asset('/js/auth/login.js') }}"></script>
 @endsection

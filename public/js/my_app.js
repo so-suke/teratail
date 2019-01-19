@@ -4,12 +4,9 @@ var mixin_app = {
     notices: [],
 		unread_notice_ids: [],
   },
-  mounted: function() {
-
-  },
   methods: {
     mark_as_read: function() {
-      //既読にする
+      //お知らせを既読にする
 			const showed_unread_ids = this.unread_notice_ids.map((notice_id) => {
 				return notice_id.id;
 			});
