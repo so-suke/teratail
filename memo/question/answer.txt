@@ -1,0 +1,15 @@
+★回答について
+
+回答フォームに内容を入力し、
+下にプレビューが表示される。「回答する」btn押下で、回答する。
+■プレビュー
+・マークダウンを自動変換して表示。(questions_inputと一緒の機能)(layouts.appでmarked.js読み込みされている)
+
+✔マークダウンのまま、インサート。
+✔(後はボタン種類を増やすだけ) 回答にも、質問入力時のような、入力補助ボタンを付ける。(テンプレートにて？)
+
+✔回答btn押下→回答テーブルインサート。
+✔■回答インサート
+form.post送信で行う。
+Route::post('/insert_answer', 'ActionController@insert_answer')->name('insert_answer');
+input:h(q_id)

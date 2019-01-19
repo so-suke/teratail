@@ -1,0 +1,87 @@
+日付別
+アクション種類別（質問、回答、フォロー）
+詳細種類（
+質問: 解決済みにしたかどうか、高評価、低評価
+回答: 高評価、低評価
+フォロー: フォローされた
+）
+
+回答id別に評価の種類などを取得。
+回答id, 評価種類, 評価された日時
+
+ベストアンサーで解決された自分の質問を取得。
+
+■自分の評価が付いている回答を取得。どっちの評価かフラグも取得。
+自分の回答id取得(with質問idも取得)
+評価テーブルにその回答idに一致する評価列を取得。
+
+--ログインユーザが投稿した、ベストアンサーで解決済みになっている、質問を取得。
+ログインユーザが投稿した、全質問idから絞り込み。
+その質問idをwhereにしてベストアンサーテーブルから情報取得。ベストアンサーされた日時が欲しい。
+//select bs.question_id, DATE_FORMAT(bs.created_at, '%m/%d') AS date
+from best_answers as bs
+where question_id in (
+	select q.id
+	from questions as q
+	where user_id=2
+)
+
+select bs.question_id, DATE_FORMAT(bs.created_at, '%m/%d') AS date, q.title
+from best_answers as bs
+join (
+	select q.id, q.title
+	from questions as q
+	where user_id=2
+) as q on bs.question_id = q.id
+
+質問配列回す
+
+日付別
+アクション別（質問）
+詳細（「ベストアンサー解決済み」）
+
+
+--ログインユーザの回答とその評価、回答を含む質問情報を取得。
+question_id->質問ページへのリンクのため。
+
+select a.question_id, q.title, a.id as a_id, ar.kind, DATE_FORMAT(ar.updated_at, '%m/%d') AS date
+from answer_rates as ar
+join (
+	select id, question_id, user_id
+	from answers
+	where user_id = 3
+) as a on ar.answer_id = a.id
+join questions as q on a.question_id = q.id
+
+同じ質問idに評価別コメントをまとめていく。
+q_id: [回答に高評価(+)をもらいました, 回答に-の評価がつきました]
+
+
+回答配列回す
+
+日付別
+アクション（回答）別（回答ごとに分ける）
+詳細（「回答に高評価(+)をもらいました, 回答に-の評価がつきました」）
+
+■自分の回答でベストアンサーに選ばれたものを取得。
+自分がした回答idsを取得。それとベストアンサーの回答idをjoin。
+select a.question_id, q.title, DATE_FORMAT(bs.created_at, '%m/%d') AS date
+from best_answers as bs
+join (
+	select id, question_id, user_id
+	from answers
+	where user_id = 1
+) as a on bs.answer_id = a.id
+join questions as q on a.question_id = q.id
+
+
+●スコアパターン増加のためにユーザ数増加とそれに付随する、質問と回答の関連の定義。
+ユーザ数増やす 5人
+u_id 2が質問(q_id 1)する。
+u_id 1が(q_id 1)にした回答(a_id 1)に
+id(3,4)がそれぞれ、高評価と低評価をする。
+id(2)が、高評価をして、回答(a_id 1)をベストアンサーに選ぶ。
+best_answers->(q_id: 1, a_id:1)
+
+todo: (u_id 1) が質問(q_id 6)をする。それに対して、 (u_id 2)が回答(a_id 5)をする。)
+(u_id 1)がその回答をベストアンサーに選ぶ。

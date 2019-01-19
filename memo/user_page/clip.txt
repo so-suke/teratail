@@ -1,0 +1,25 @@
+質問クリップ機能
+
+✔clipsテーブル作成
+user_id, q_id
+php artisan make:migration create_clips_table
+php artisan make:seeder ClipsTableSeeder
+php artisan make:model Clip
+
+✔clipsテーブル、データ登録
+user_id 1
+q_id 2, 4
+
+✔クリップしてある質問を取得するsql。
+//clipsテーブルからuser_idで絞り込み。質問ids
+//とquestionsテーブルでjoin。
+
+select *
+from questions as q
+join (select question_id
+from clips
+where user_id = 1) as c on q.id = c.question_id
+
+■質問配列取得方法
+ユーザページでクリップタブ押下時、表示すればいいので、
+vuejsのquestions配列に取得した質問配列をセットする関数を定義した。

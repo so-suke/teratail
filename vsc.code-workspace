@@ -1,0 +1,38 @@
+{
+	"folders": [
+		{
+			"path": "app/Http/Controllers"
+		},
+		{
+			"path": "database"
+		},
+		{
+			"path": "routes"
+		},
+		{
+			"path": "resources/views"
+		},
+		{
+			"path": "public/css"
+		},
+		{
+			"path": "memo"
+		},
+		{
+			"path": "public/img"
+		},
+		{
+			"path": "public/js"
+		},
+		{
+			"path": "storage/img"
+		},
+		{
+			"path": "storage/logs"
+		},
+		{
+			"path": "app/variables"
+		}
+	],
+	"settings": {}
+}

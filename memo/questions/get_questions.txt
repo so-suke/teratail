@@ -1,0 +1,31 @@
+質問取得時、所有タグも一緒に取得。
+各質問ごとにタグsを所有している。
+■各質問取得
+質問タグテーブルから表示質問idに該当するタグを取得してくる。
+質問idsをsqlのIN句に展開。
+
+-- 該当質問idsのタグ情報を取得。
+$qtt_list = select qtt.question_id, qtt.tag_id, t.name as 'tag_name'
+from question_to_tags as qtt
+join tags as t on qtt.tag_id = t.id
+and qtt.question_id in (1,2)
+
+質問idをキーとしたタグ情報(タグid, タグname)配列を作成。
+$q_id_tags = [];
+foreach($qtt_list as $qtt) {
+	$q_id_tags[$qtt->question_id][] = [
+		'tag_id' => $qtt->tag_id,
+		'tag_name' => $qtt->tag_name,
+	];
+}
+
+質問を回して、対象質問idをキーとして、上記配列から値を取得
+→質問のタグ配列propertyに代入。
+foreach($questions as $question) {
+	$question->tags = $q_id_tags[$question->id];
+}
+
+■トップページviewの表示
+$questionsを渡す。
+書く質問ごとにタグsを表示。
+data属性にタグid, textにタグname を表示。

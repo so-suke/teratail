@@ -1,0 +1,108 @@
+★トップページ
+myタグによる絞り込み
+(ログインユーザの登録タグによる絞り込み)
+■読み込み時
+session確認(絞り込み状態)
+myタグ取得。
+■絞り込みは、ON/OFFがある。
+設定時sessionに保存。もし、読み込み時、未設定であれば、offにする。
+ON/OFF切替のtoggleボタン的なものを作る。
+ON時、myタグ未登録であるならば、タグ登録または質問を促すmsgを表示。
+msg[結果が見つかりませんでした], ref = not_my_tag_result
+■まず、ユーザに登録タグの登録を出来るようにする。
+✔右側のボックスにタグ登録インプットを表示。
+✔myタグ登録に関する勧めを表示。
+✔質問時と同じ、タグ入力方式。
+✔※選択タグと登録ボタンは同じ枠内に表示。
+✔タグ入力→候補表示→選択→「このタグをmyタグに追加ボタン」表示。
+✔候補表示「tagIDとtag名」→選択「js側でselected_my_tag_idsにpush」//todo
+✔「（v-forで配置）selected_my_tag_idsのidをinput:hiddenに配置。」
+●追加ボタン押下「ajaxでmytagsに登録」(/ajax_q/add_to_my_tag/)
+	✔→ポスト送信、選択されたタグを送信。
+	✔→送信されてきたtagsをmy_tagsテーブルに一つづつ追加。
+	✔ajax, post 送信、選択されたタグ
+	✔帰ってきて、mytag読み込み、inputed_tags=[]
+	もしタグ絞り込みONなら再度、質問読み込み
+※トップページ読み込み時、myタグによる絞り込みのON/OFF状態をsessionより取得。
+もし、状態がsessionに未設定であれば、OFFに設定する。
+■もしONなら質問でタグにmyタグが含まれているものを取得してくる。
+※myタグが登録されているか判断する。
+select tag_id
+from my_tags
+where owner_id = 1->exists();
+●if true↓
+myタグが含まれる質問idを取得、その質問idに該当する質問を取得。
+$questions = select *
+from questions
+where id in (
+	select question_id
+	from question_to_tags
+	where tag_id in (
+		select tag_id
+		from my_tags
+		where owner_id = 1
+	)
+);
+
+●if false↓
+質問取得しない。
+
+もしOFFであるならば、全質問を取得。
+※質問数を増加させる。(質問を5個作る。)
+■my_tagsテーブル情報(migration)
+id, owner_id, tag_id, 
+owner_id -> foreign_key 
+tag_id -> foreign_key 
+(seeding)
+$owner_id_tag_ids = [
+	1 => [4, 7],
+];
+■my_tags読み込み処理
+トップページ読み込み時に取得してくる。
+html作っておく。
+
+■テストの流れ
+bash, phpをmytagに登録。
+質問登録時のタグ(
+	[C++, C],//[5, 4]
+	[bash, C],//[1, 4]
+	[php, javascript],//[7, 11]
+	[python, php],//[8, 7]
+	[ruby, vuejs],//[9, 12]
+)
+
+■作業順序
+	myタグの編集関連を出来るようにする。
+		#登録フォーム作成
+			フォーム送信、mytagsテーブルにインサート。
+			$tag_ids = $request->tag_ids;
+			$my_tags = new MyTags;
+			$my_tags->owner_id = Auth::id();
+			foreach($tag_ids as $tag_id) {
+				$my_tags->tag_id = $tag_id;
+			}
+		編集(削除)(登録後)
+			✔mytagsが登録してあるならば、編集ボタンを表示させる。
+		■もし、loginユーザのmytagsが登録済みの状態でページを読み込んだ場合
+			■登録済みのタグを表示する。
+				✔その際、タグ名には、特定タグページへのリンク配置。（後で作る）
+	myタグ絞り込みのON(厳密)/OFF(なし)切替できるようにする。
+		トグルボタン設置
+		ON時
+			my_tag_toggle_mode 厳密
+			絞り込みモード(filter_mode)
+			post送信でsessionのmy_tag絞り込みモードを厳密にする
+				/register_my_tag_filter_mode/{mode_name}
+				/register_my_tag_filter_mode/strict
+
+			返却次第、質問取得時、厳密/なし で絞り込みモードを切り替える。
+				セッションを見て、絞り込みモードが格納されているか確認。
+				格納されてないなら、なし　として処理。
+				格納されているなら、それで判断して処理。
+				厳密->my_tagがtagに含まれている質問のみ取得。
+				なし->すべての質問のみ取得。
+		OFF時
+			my_tag_toggle_mode なし
+			/toggle_my_tag_filter_mode/none
+			ON時と、同様処理。
+■mytag 登録時、
